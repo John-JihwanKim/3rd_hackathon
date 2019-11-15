@@ -1,0 +1,12 @@
+---- Serial. Matches (11 in 2 files) ----
+CalulationTemperatureForPotBottom in ReadTemperatureADC.cpp :       Serial.println("You may not connect the NTC");
+InitUARTForDebugging in UARTForInduction.cpp :    Serial.begin(115200);
+InitUARTForDebugging in UARTForInduction.cpp :    Serial.println("Welcom UART testing Mode");
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.print("Data(Height:Tfood:Tbottom:Weight = ");
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.print(GetHeightFromSensorToTarget());
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.print(":");
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.print(GetFoodSurfaceTemperature());
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.print(":");
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.println(GetTemperatureForPotBottom());
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.print(":");
+PrintInformationForDebugging in UARTForInduction.cpp :    Serial.println(SetCurrentWeight());
