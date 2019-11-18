@@ -14,8 +14,10 @@ void SetRemainedTime(uint16_t time)
 
 uint16_t GetRemainedTime(void)
 {
+#ifdef DEBUG
    Serial.print("@@@@@ GetRemainedTime: = ");
    Serial.println(RemainedTime);
+#endif
    return(RemainedTime);
 }
 
@@ -26,8 +28,10 @@ void SetCookRemainedTime(uint16_t time)
 
 uint16_t GetCookRemainedTime(void)
 {
+#ifdef DEBUG
    Serial.print("@@@@@ GetCookRemainedTime: = ");
    Serial.println(CookTime);
+#endif
    return(CookTime);
 }
 
