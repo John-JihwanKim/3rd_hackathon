@@ -4,6 +4,9 @@
 #include "I2C.h"
 #include "ReadTemperatureADC.h"
 #include "SystemStatus.h"
+#include "ControlCookingTime.h"
+#include "ControlRecipes.h"
+
 
 /* Timer base on 1-millisecond */
 static AsyncDelay OneSecondInterval;
@@ -23,8 +26,20 @@ static void EveryThreeHundredmSecondLoop(void)
 
 static void EveryOneSecondLoop(void)
 {
+   uint16_t remainedTime = GetRemainedTime();
    SendDataToBLEFrequently();
    PrintInformationForDebugging();
+
+   if(remainedTime > 0)
+   {
+      SetRemainedTime(remainedTime-1);
+   }
+   if(GetRemainedTime() == 0 && GetStepOfCurrentCooking() == eSYSTEM_CUR_COOK_STARTED)
+   {
+      // TODO : handle time out and finish cook
+      SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_OFF);
+   }
+   SendDataToBLEFrequently();
 }
 
 static void initializeThunder(void)

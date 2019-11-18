@@ -5,11 +5,15 @@
 
 #include "ControlRecipes.h"
 
-static uint8_t StepOfCurrentCooking = 0;
+static eSYSTEM_CURRENT_COOK_STATUS StepOfCurrentCooking = eSYSTEM_CUR_COOK_OFF;
 static uint8_t MaxStepOfCurrentCooking = 0;
 static uint8_t WhatstheRecipeIndexOfCurrentCooking = 0;
 
-uint8_t GetStepOfCurrentCooking(void)
+void SetStepOfCurrentCooking(eSYSTEM_CURRENT_COOK_STATUS status)
+{
+   StepOfCurrentCooking = status;
+}
+eSYSTEM_CURRENT_COOK_STATUS GetStepOfCurrentCooking(void)
 {
    return(StepOfCurrentCooking);
 }

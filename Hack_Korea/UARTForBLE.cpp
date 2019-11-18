@@ -56,7 +56,7 @@ static void SetTXDataForBLE(void)
    TXToBLE[eBLE_TX_HEIGHT_FROMSENSOR_TOTARGET] = (uint8_t)GetHeightFromSensorToTarget();
    TXToBLE[eBLE_TX_REMAINED_TIME0] = (uint8_t)(remainedtime >> 8);
    TXToBLE[eBLE_TX_REMAINED_TIME1] = (uint8_t)remainedtime;
-   TXToBLE[eBLE_TX_NUMBER_OF_STEPS_CURRENT_COOKING] = GetStepOfCurrentCooking();
+   TXToBLE[eBLE_TX_NUMBER_OF_STEPS_CURRENT_COOKING] = GetStepOfCurrentCooking(); // Current cooking status
    TXToBLE[eBLE_TX_MAX_STEPS_CURRENT_COOKING] = GetMaxStepOfCurrentCooking();
    TXToBLE[eBLE_TX_WHATS_THE_RECIPE_INDEX_CURRENT_COOKING] = GetWhatstheRecipeIndexOfCurrentCooking();
 
@@ -88,7 +88,6 @@ static void ProcessingForRecievedRXFromBLE(void)
    //eBLE_RX_MAX_STEPS_FOR_USERCOOKING,
    //eBLE_RX_WHATS_THE_RECIPE_INDEX_FOR_USERCOOKING,
 
-
    SetTXDataForBLE();
    TXToBLE[eBLE_TX_RESPONSE] = 1;
    SendingTXBufferToBLE();
@@ -99,9 +98,12 @@ static void ProcessingForRecievedRXFromBLE(void)
 
    if(GetCurrentInductionLevel() != 0 || GetCurrentACLoads() != 0)
    {
+      // #### START COOK ??  #######
       // TODO : Check if started and set system started
       // AND start timer
       // countTimer(5);
+      // SetRemainedTime();
+      SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED);
       SetUISystemStatus(eSYSTEM_STARTED);
    }
    else

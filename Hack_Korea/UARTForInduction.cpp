@@ -142,8 +142,11 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT1]);
    SetCurrentWeight(weight);
 
-   //eIND_RX_STATUS_NEEDPAUSE_ERROR,
-   //eIND_RX_STATUS_NO_NEEDPAUSE_ERROR,
+   if((uint8_t)weight > 200)
+   {
+      // START DETECTING
+
+   }
 }
 
 void SendDataToThunderInductionFrequently(void)
