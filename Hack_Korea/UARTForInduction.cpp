@@ -91,6 +91,10 @@ static void SetTXDataForThunderInduction(void)
    TXToInduction[eIND_TX_CRC0] = (uint8_t)(crc >> 8);
    TXToInduction[eIND_TX_CRC1] = (uint8_t)crc;
    TXToInduction[eIND_TX_ETX] = ETX;
+   if(GetUISystemStatus() == eSYSTEM_COOKDONE)
+   {
+      SetUISystemStatus(eSYSTEM_STANDBY);
+   }
 }
 
 static void ProcessingForRecievedRXFromThunderInduction(void)
@@ -153,7 +157,6 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
       // START DETECTING
       SetWhatstheRecipeIndexOfCurrentCooking(1);
       SendDataToBLEFrequently();
-      SetWhatstheRecipeIndexOfCurrentCooking(0);
    }
 }
 

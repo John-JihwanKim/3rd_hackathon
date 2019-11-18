@@ -4,13 +4,21 @@
 typedef enum 
 {
    eDETECT_NONE = 0,
+   eDETECT_SHRIMP,
    eDETECT_BEEF,
-   eDETECT_ASPARAGUS,
-   eDETECT_BEEF_ASPARAGUS_KIT,
-   eDETECT_BEEF_SHRIMP_ASPARAGUS_KIT,
+   eDETECT_VEGETABLE,
 } eDETECT_STATUS;
 
-void SetDetectStatus(eDETECT_STATUS status);
-eDETECT_STATUS GetDetectStatus(void);
+void SetLeftFrontStatus(eDETECT_STATUS status);
+eDETECT_STATUS GetLeftFrontStatus(void);
+
+void SetRightFrontStatus(eDETECT_STATUS status);
+eDETECT_STATUS GetRightFrontStatus(void);
+
+void SetLeftRearStatus(eDETECT_STATUS status);
+eDETECT_STATUS GetLeftRearStatus(void);
+
+void SetRightRearStatus(eDETECT_STATUS status);
+eDETECT_STATUS GetRightRearStatus(void);
 
 #endif

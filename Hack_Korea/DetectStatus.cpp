@@ -1,18 +1,58 @@
-#include "Arduino.h"
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include "typedef.h"
+// #include <SoftwareSerial.h>
 
-#include "DetectStatus.h"
+// #include "Arduino.h"
+// #include <avr/io.h>
+// #include <avr/interrupt.h>
+// #include "typedef.h"
 
-static eDETECT_STATUS DetectStatus = eDETECT_NONE;
+// #include "DetectStatus.h"
 
-void SetDetectStatus(eDETECT_STATUS status)
-{
-   DetectStatus = status;
-}
+// static eDETECT_STATUS LeftFrontStatus = eDETECT_NONE;
+// static eDETECT_STATUS RightFrontStatus = eDETECT_NONE;
+// static eDETECT_STATUS LeftRearStatus = eDETECT_NONE;
+// static eDETECT_STATUS RightRearStatus = eDETECT_NONE;
 
-eDETECT_STATUS GetDetectStatus(void)
-{
-   return(DetectStatus);
-}
+// void SetDetectStatus(eDETECT_STATUS status)
+// {
+//    DetectStatus = status;
+// }
+
+// eDETECT_STATUS GetDetectStatus(void)
+// {
+//    return(DetectStatus);
+// }
+
+// void SetLeftFrontStatus(eDETECT_STATUS status)
+// {
+//    LeftFrontStatus = status;
+// }
+
+// eDETECT_STATUS GetLeftFrontStatus(void)
+// {
+//    return(LeftFrontStatus);
+// }
+
+// void SetRightFrontStatus(eDETECT_STATUS status)
+// {
+   
+// }
+// eDETECT_STATUS GetRightFrontStatus(void)
+// {
+
+// }
+// void SetLeftRearStatus(eDETECT_STATUS status)
+// {
+
+// }
+// eDETECT_STATUS GetLeftRearStatus(void)
+// {
+
+// }
+// void SetRightRearStatus(eDETECT_STATUS status)
+// {
+
+// }
+// eDETECT_STATUS GetRightRearStatus(void)
+// {
+   
+// }

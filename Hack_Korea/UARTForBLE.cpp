@@ -23,7 +23,11 @@ static void StartCook(void)
 {
    SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED_1);
    SetUISystemStatus(eSYSTEM_STARTED);
-   SetRemainedTime(210);
+   // SetRemainedTime(630);
+   // SetCookRemainedTime(210);
+   
+   SetRemainedTime(25);
+   SetCookRemainedTime(5);
    // First cycle - induction
    SetCurrentInductionLevel(10);
    SetCurrentACLoads(0);
@@ -79,6 +83,7 @@ static void SetTXDataForBLE(void)
    TXToBLE[eBLE_TX_CRC0] = (uint8_t)(crc >> 8);
    TXToBLE[eBLE_TX_CRC1] = (uint8_t)crc;
    TXToBLE[eBLE_TX_ETX] = ETX;
+   SetWhatstheRecipeIndexOfCurrentCooking(0);
 }
 
 static void ProcessingForRecievedRXFromBLE(void)
@@ -135,9 +140,7 @@ static void ProcessingForRecievedRXFromBLE(void)
    {
       // START
       Serial.println("### Start Recived!! ###");
-      SetWhatstheRecipeIndexOfCurrentCooking(1);
       SendDataToBLEFrequently();
-      SetWhatstheRecipeIndexOfCurrentCooking(0);
       
       StartCook();
    }
