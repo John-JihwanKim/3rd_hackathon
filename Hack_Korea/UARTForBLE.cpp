@@ -56,6 +56,10 @@ static void SetTXDataForBLE(void)
    TXToBLE[eBLE_TX_HEIGHT_FROMSENSOR_TOTARGET] = (uint8_t)GetHeightFromSensorToTarget();
    TXToBLE[eBLE_TX_REMAINED_TIME0] = (uint8_t)(remainedtime >> 8);
    TXToBLE[eBLE_TX_REMAINED_TIME1] = (uint8_t)remainedtime;
+   TXToBLE[eBLE_TX_DETECTED_FOOD_LR] = 0;
+   TXToBLE[eBLE_TX_DETECTED_FOOD_RR] = 0;
+   TXToBLE[eBLE_TX_DETECTED_FOOD_LF] = 0;
+   TXToBLE[eBLE_TX_DETECTED_FOOD_RF] = 0;
    TXToBLE[eBLE_TX_NUMBER_OF_STEPS_CURRENT_COOKING] = GetStepOfCurrentCooking(); // Current cooking status
    TXToBLE[eBLE_TX_MAX_STEPS_CURRENT_COOKING] = GetMaxStepOfCurrentCooking();
    TXToBLE[eBLE_TX_WHATS_THE_RECIPE_INDEX_CURRENT_COOKING] = GetWhatstheRecipeIndexOfCurrentCooking();
@@ -91,24 +95,37 @@ static void ProcessingForRecievedRXFromBLE(void)
    SetTXDataForBLE();
    TXToBLE[eBLE_TX_RESPONSE] = 1;
    SendingTXBufferToBLE();
-   SetZeroWeight(RXFromBLE[eBLE_RX_WHATS_THE_RECIPE_INDEX_FOR_USERCOOKING]);
-   SendDataToThunderInductionFrequently();
-   SetZeroWeight(0);
-   SendDataToThunderInductionFrequently();
 
-   if(GetCurrentInductionLevel() != 0 || GetCurrentACLoads() != 0)
+   // Set Zero weight test
+   // SetZeroWeight(RXFromBLE[eBLE_RX_WHATS_THE_RECIPE_INDEX_FOR_USERCOOKING]);
+   // SendDataToThunderInductionFrequently();
+   // SetZeroWeight(0);
+   // SendDataToThunderInductionFrequently();
+
+
+   // TEST : Start cook test
+   // if(GetCurrentInductionLevel() != 0 || GetCurrentACLoads() != 0)
+   // {
+   //    // #### START COOK ??  #######
+   //    // TODO : Check if started and set system started
+   //    // AND start timer
+   //    // countTimer(5);
+   //    // SetRemainedTime();
+   //    SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED);
+   //    SetUISystemStatus(eSYSTEM_STARTED);
+   // }
+   // else
+   // {
+   //    SetUISystemStatus(eSYSTEM_STANDBY);
+   // }
+   
+   SetWhatstheRecipeIndexOfCurrentCooking(RXFromBLE[eBLE_RX_WHATS_THE_RECIPE_INDEX_FOR_USERCOOKING]);
+   if(GetWhatstheRecipeIndexOfCurrentCooking() == 2)
    {
-      // #### START COOK ??  #######
-      // TODO : Check if started and set system started
-      // AND start timer
-      // countTimer(5);
-      // SetRemainedTime();
+      // START
+      Serial.println("### Start Recived!! ###");
       SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED);
       SetUISystemStatus(eSYSTEM_STARTED);
-   }
-   else
-   {
-      SetUISystemStatus(eSYSTEM_STANDBY);
    }
 }
 

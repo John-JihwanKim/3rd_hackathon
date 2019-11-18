@@ -7,6 +7,7 @@
 #include "ControlWeight.h"
 #include "ControlInduction.h"
 #include "ControlACLoads.h"
+#include "ControlRecipes.h"
 #include "ControlHeightForUpperHeater.h"
 #include "SystemStatus.h"
 #include "SetZeroWeight.h"
@@ -145,7 +146,7 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    if((uint8_t)weight > 200)
    {
       // START DETECTING
-
+      SetWhatstheRecipeIndexOfCurrentCooking(1);
    }
 }
 

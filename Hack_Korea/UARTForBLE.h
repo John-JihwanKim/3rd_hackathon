@@ -19,6 +19,10 @@ typedef enum
    eBLE_TX_HEIGHT_FROMSENSOR_TOTARGET,
    eBLE_TX_REMAINED_TIME0,
    eBLE_TX_REMAINED_TIME1,
+   eBLE_TX_DETECTED_FOOD_LR,// detect food, left rear
+   eBLE_TX_DETECTED_FOOD_RR,// detect food, right rear
+   eBLE_TX_DETECTED_FOOD_LF,// detect food, left front
+   eBLE_TX_DETECTED_FOOD_RF,// detect food, right front
    eBLE_TX_NUMBER_OF_STEPS_CURRENT_COOKING,// Current cooking status
    eBLE_TX_MAX_STEPS_CURRENT_COOKING,
    eBLE_TX_WHATS_THE_RECIPE_INDEX_CURRENT_COOKING,// notice to app

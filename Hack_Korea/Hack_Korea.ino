@@ -27,7 +27,7 @@ static void EveryThreeHundredmSecondLoop(void)
 static void EveryOneSecondLoop(void)
 {
    uint16_t remainedTime = GetRemainedTime();
-   SendDataToBLEFrequently();
+   // SendDataToBLEFrequently();
    PrintInformationForDebugging();
 
    if(remainedTime > 0)
@@ -55,6 +55,7 @@ void setup()
    initializeThunder();
 
    I2CSensorInit();
+   // SetRemainedTime(100); // for the test
    OneSecondInterval.start(1000, AsyncDelay::MILLIS);
    TwoHundredmSecondInterval.start(200, AsyncDelay::MILLIS);
    ThreeHundredmSecondInterval.start(300, AsyncDelay::MILLIS);
