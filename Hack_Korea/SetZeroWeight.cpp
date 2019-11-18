@@ -9,7 +9,7 @@ static uint8_t ZeroStatus = 0;
 
 void SetZeroWeight(uint8_t status)
 {
-   Serial.print("From Induction = ");
+   // Serial.print("From Induction = ");
    ZeroStatus = status;
 }
 

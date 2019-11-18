@@ -13,6 +13,7 @@
 #include "SetZeroWeight.h"
 #include "ReadTemperatureADC.h"
 #include "I2C.h"
+#include "UARTForBLE.h"
 
 static uint8_t TXToInduction[eIND_TX_ETX + 1] = {0};
 static uint8_t RXFromInduction[eIND_RX_ETX + 1] = {0};
@@ -131,6 +132,10 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
       SendDataToThunderInductionFrequently();
       SetUISystemStatus(eSYSTEM_STANDBY);
       SendDataToThunderInductionFrequently();
+      SetCurrentInductionLevel(0);
+      SetCurrentACLoads(0);
+      SetTargetHeightForUpperHeater(0);
+      SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_OFF);
       break;
    }
 
@@ -147,6 +152,8 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    {
       // START DETECTING
       SetWhatstheRecipeIndexOfCurrentCooking(1);
+      SendDataToBLEFrequently();
+      SetWhatstheRecipeIndexOfCurrentCooking(0);
    }
 }
 

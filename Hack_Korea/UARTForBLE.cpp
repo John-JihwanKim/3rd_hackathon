@@ -19,6 +19,17 @@
 static uint8_t TXToBLE[eBLE_TX_ETX + 1] = {0};
 static uint8_t RXFromBLE[eBLE_RX_ETX + 1] = {0};
 
+static void StartCook(void)
+{
+   SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED_1);
+   SetUISystemStatus(eSYSTEM_STARTED);
+   SetRemainedTime(210);
+   // First cycle - induction
+   SetCurrentInductionLevel(10);
+   SetCurrentACLoads(0);
+   SetTargetHeightForUpperHeater(5);
+}
+
 static void SendingTXBufferToBLE(void)
 {
    Serial.print("To BLE = ");
@@ -124,8 +135,11 @@ static void ProcessingForRecievedRXFromBLE(void)
    {
       // START
       Serial.println("### Start Recived!! ###");
-      SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED);
-      SetUISystemStatus(eSYSTEM_STARTED);
+      SetWhatstheRecipeIndexOfCurrentCooking(1);
+      SendDataToBLEFrequently();
+      SetWhatstheRecipeIndexOfCurrentCooking(0);
+      
+      StartCook();
    }
 }
 
