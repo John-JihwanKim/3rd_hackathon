@@ -1,4 +1,3 @@
-#include <SoftwareSerial.h>
 #include "UARTForInduction.h"
 #include "UARTForBLE.h"
 #include "AsyncDelay.h"
@@ -10,8 +9,7 @@
 #include "ControlInduction.h"
 #include "ControlACLoads.h"
 #include "ControlHeightForUpperHeater.h"
-
-#define DEBUG 1
+#include "SetZeroWeight.h"
 
 /* Timer base on 1-millisecond */
 static AsyncDelay OneSecondInterval;
@@ -19,17 +17,7 @@ static AsyncDelay ThreeHundredmSecondInterval;
 static AsyncDelay TwoHundredmSecondInterval;
 // static 
 
-// Serial for Camera
-// RX, TX
-SoftwareSerial cameraSerial(19, 18);
-static void InitUARTForCamera(void)
-{
-   cameraSerial.begin(4800);
-   while (!cameraSerial)
-   {
-      ; // wait for serial port to connect. Needed for Leonardo only
-   }
-}
+
 static void EveryTwoHundredmSecondLoop(void)
 {
    SendDataToThunderInductionFrequently();
@@ -41,10 +29,16 @@ static void EveryThreeHundredmSecondLoop(void)
    CalulationTemperatureForPotBottom();
 }
 
+static void InitUARTForCamera(void)
+{
+   Serial1.begin(115200);
+}
+
 static void EveryOneSecondLoop(void)
 {
    uint16_t remainedTime = GetRemainedTime();
    uint16_t cookRemainedTime = GetCookRemainedTime();
+   // SendDataToBLEFrequently();
    PrintInformationForDebugging();
 
    if(cookRemainedTime > 0)
@@ -55,9 +49,8 @@ static void EveryOneSecondLoop(void)
 
    if (GetCookRemainedTime() == 0 && GetStepOfCurrentCooking() == eSYSTEM_CUR_COOK_STARTED_1)
    {
-      // SetCookRemainedTime(240); // For Real
-      SetCookRemainedTime(20);  // For Test
-
+      //SetCookRemainedTime(420);
+      SetCookRemainedTime(20);
       // Second cycle - heater
       SetCurrentInductionLevel(0);
       SetCurrentACLoads(7);
@@ -86,13 +79,18 @@ static void initializeThunder(void)
 void setup()
 {
    InitUARTForDebugging();
-   // InitUARTForThunderInduction();
-   // InitUARTForBLE();
-   // initializeThunder();
-   // InitUARTForCamera();
+   InitUARTForThunderInduction();
+   InitUARTForBLE();
+   initializeThunder();
+   SetZeroWeight(1);
+   SendDataToThunderInductionFrequently();
+   SetZeroWeight(0);
+
+   InitUARTForCamera();
+   // Serial.println("Initialize All UARTs");
 
    I2CSensorInit();
-   SetRemainedTime(390); // for the test
+   // SetRemainedTime(100); // for the test
    OneSecondInterval.start(1000, AsyncDelay::MILLIS);
    TwoHundredmSecondInterval.start(200, AsyncDelay::MILLIS);
    ThreeHundredmSecondInterval.start(300, AsyncDelay::MILLIS);
@@ -100,7 +98,6 @@ void setup()
 
 void loop()
 {
-   
    static char rxBuffer[4];
    if(TwoHundredmSecondInterval.isExpired())
    {
@@ -119,17 +116,16 @@ void loop()
       EveryOneSecondLoop();
       OneSecondInterval.repeat();
    }
-
-   while(cameraSerial.available() > 0)
+   if(Serial1.available())
    {
-      Serial.println("Camera Detection Data Start");
-      
-      for(unsigned char i = 0; i < 4; i++)
+      Serial.print("Camera Detection Data Start");
+
+      for (unsigned char i = 0; i < 4; i++)
       {
-         rxBuffer[i] = Serial.read();
+         rxBuffer[i] = Serial1.read();
          Serial.print(rxBuffer[i]);
       }
-      
-      Serial.println("Camera Detection Data End");
+
+      Serial.print("Camera Detection Data End");
    }
 }

@@ -17,6 +17,7 @@
 
 static uint8_t TXToInduction[eIND_TX_ETX + 1] = {0};
 static uint8_t RXFromInduction[eIND_RX_ETX + 1] = {0};
+static bool weightDetectNotice = false;
 
 uint16_t CalcultationCRC(uint8_t *buf, uint8_t len)
 {
@@ -154,7 +155,7 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    SetCurrentWeight(weight);
 
    // @@@   TODO : Read weight and configure..  @@@
-   if((uint8_t)weight > 200)
+   if(weight > 900)
    {
       // START DETECTING
       SetWhatstheRecipeIndexOfCurrentCooking(1);
