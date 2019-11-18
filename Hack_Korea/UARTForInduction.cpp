@@ -9,6 +9,7 @@
 #include "ControlACLoads.h"
 #include "ControlHeightForUpperHeater.h"
 #include "SystemStatus.h"
+#include "SetZeroWeight.h"
 #include "ReadTemperatureADC.h"
 #include "I2C.h"
 
@@ -55,27 +56,29 @@ static void SendingTXBufferToThunderInduction(void)
 
 static void LogDataForThunderInduction(void)
 {
-   Serial.print("InductionStatus:InductionLevel:HeightForHeater: = ");
+   Serial.print("InductionStatus:InductionLevel:HeightForHeater:zeroweight = ");
    Serial.print(GetInductionSystemStatus());
    Serial.print(":");
    Serial.print(GetCurrentInductionLevel());
    Serial.print(":");
-   Serial.println(GetTargetHeightForUpperHeater());
+   Serial.print(GetTargetHeightForUpperHeater());
+   Serial.print(":");
+   Serial.println(GetZeroWeight());
 }
 
 static void SetTXDataForThunderInduction(void)
 {
-   // LogDataForThunderInduction();
+   LogDataForThunderInduction();
    uint16_t crc = 0;
    
    TXToInduction[eIND_TX_STX] = STX;
    TXToInduction[eIND_TX_UARTLENGTH] = TXUART_LENGTH_TO_INDUCTION;
    TXToInduction[eIND_TX_UISTATUS_SYSTEM] = (uint8_t)GetUISystemStatus();
-   TXToInduction[eIND_TX_MAINSTATUS_SYSTEM] = (uint8_t)GetInductionSystemStatus(); 
+   TXToInduction[eIND_TX_MAINSTATUS_SYSTEM] = (uint8_t)GetInductionSystemStatus();
    TXToInduction[eIND_TX_INDUCTIONLEVEL] = GetCurrentInductionLevel();
    TXToInduction[eIND_TX_ACLOADS] = GetCurrentACLoads();
    TXToInduction[eIND_TX_HEIGHT_UPPERHEATER] = GetTargetHeightForUpperHeater();
-   TXToInduction[eIND_TX_SETZERO_WEIGHT] = 0;
+   TXToInduction[eIND_TX_SETZERO_WEIGHT] = GetZeroWeight();
    TXToInduction[eIND_TX_TEMP0] = 0;
    TXToInduction[eIND_TX_TEMP1] = 0;
    TXToInduction[eIND_TX_TEMP2] = 0;
@@ -100,18 +103,45 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
       return;
    }
 
-   //SetSystemStatus(eIND_RX_UISTATUS_SYSTEAM);
-   SetInductionSystemStatus(RXFromInduction[eIND_RX_MAINSTATUS_SYSTEAM]);   
+   SetInductionSystemStatus(RXFromInduction[eIND_RX_MAINSTATUS_SYSTEAM]);
    SetCurrentHeightForUpperHeater(RXFromInduction[eIND_RX_HEIGHT_UPPERHEATER]);
-   //   eIND_RX_STATUS_DOOR,
+
+   Serial.print("@@@@@ InductionStatus: = ");
+   Serial.println(GetInductionSystemStatus());
+
+   switch (GetInductionSystemStatus())
+   {
+   case eSYSTEM_ON:
+      SetUISystemStatus(eSYSTEM_INITING);
+      break;
+   case eSYSTEM_INITING:
+      SetUISystemStatus(eSYSTEM_INITING);
+      break;
+
+   case eSYSTEM_INITED:
+      SetUISystemStatus(eSYSTEM_INITED);
+      SendDataToThunderInductionFrequently();
+      SetUISystemStatus(eSYSTEM_STANDBY);
+      SendDataToThunderInductionFrequently();
+      break;
+   case eSYSTEM_ERROR:
+      Serial.println("@@@@@ ERROR @@@ ");
+      SetUISystemStatus(eSYSTEM_ERROR);
+      SendDataToThunderInductionFrequently();
+      SetUISystemStatus(eSYSTEM_STANDBY);
+      SendDataToThunderInductionFrequently();
+      break;
+   }
+
    weight = RXFromInduction[eIND_RX_VALUE_WEIGHT0];
-   //Serial.print("1 : ");
-   //Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT0]);
+   Serial.print("1 : ");
+   Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT0]);
    weight <<= 8;
    weight |= RXFromInduction[eIND_RX_VALUE_WEIGHT1];
-   //Serial.print("2 : ");
-   //Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT1]);
+   Serial.print("2 : ");
+   Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT1]);
    SetCurrentWeight(weight);
+
    //eIND_RX_STATUS_NEEDPAUSE_ERROR,
    //eIND_RX_STATUS_NO_NEEDPAUSE_ERROR,
 }

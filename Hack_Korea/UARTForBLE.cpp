@@ -14,6 +14,7 @@
 #include "SystemStatus.h"
 #include "ControlCookingTime.h"
 #include "ControlRecipes.h"
+#include "SetZeroWeight.h"
 
 static uint8_t TXToBLE[eBLE_TX_ETX + 1] = {0};
 static uint8_t RXFromBLE[eBLE_RX_ETX + 1] = {0};
@@ -76,7 +77,6 @@ static void ProcessingForRecievedRXFromBLE(void)
    {
       return;
    }
-   
    //eBLE_RX_CONNECTION_STATUS,
    SetUISystemStatus(RXFromBLE[eBLE_RX_UISTATUS_SYSTEM]);
    SetCurrentInductionLevel(RXFromBLE[eBLE_RX_INDUCTIONLEVEL]);
@@ -88,9 +88,26 @@ static void ProcessingForRecievedRXFromBLE(void)
    //eBLE_RX_MAX_STEPS_FOR_USERCOOKING,
    //eBLE_RX_WHATS_THE_RECIPE_INDEX_FOR_USERCOOKING,
 
+
    SetTXDataForBLE();
    TXToBLE[eBLE_TX_RESPONSE] = 1;
    SendingTXBufferToBLE();
+   SetZeroWeight(RXFromBLE[eBLE_RX_WHATS_THE_RECIPE_INDEX_FOR_USERCOOKING]);
+   SendDataToThunderInductionFrequently();
+   SetZeroWeight(0);
+   SendDataToThunderInductionFrequently();
+
+   if(GetCurrentInductionLevel() != 0 || GetCurrentACLoads() != 0)
+   {
+      // TODO : Check if started and set system started
+      // AND start timer
+      // countTimer(5);
+      SetUISystemStatus(eSYSTEM_STARTED);
+   }
+   else
+   {
+      SetUISystemStatus(eSYSTEM_STANDBY);
+   }
 }
 
 ISR(USART3_RX_vect)//This is from Thunder BLE

@@ -2,7 +2,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "typedef.h"
-
 #include "ControlCookingTime.h"
 
 static uint16_t RemainedTime = 0;

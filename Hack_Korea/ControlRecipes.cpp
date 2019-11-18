@@ -21,5 +21,9 @@ uint8_t GetWhatstheRecipeIndexOfCurrentCooking(void)
 {
    return(WhatstheRecipeIndexOfCurrentCooking);
 }
+void SetWhatstheRecipeIndexOfCurrentCooking(uint8_t recipe)
+{
+   WhatstheRecipeIndexOfCurrentCooking = recipe;
+}
 
 

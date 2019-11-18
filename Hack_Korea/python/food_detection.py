@@ -28,6 +28,7 @@ import time
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
+
 def load_graph(model_file):
     graph = tf.Graph()
     graph_def = tf.GraphDef()
@@ -39,34 +40,8 @@ def load_graph(model_file):
 
     return graph
 
-def read_tensor_from_image_file(file_name,
-                                input_height=299,
-                                input_width=299,
-                                input_mean=0,
-                                input_std=255):
-    input_name = "file_reader"
-    output_name = "normalized"
-    file_reader = tf.read_file(file_name, input_name)
-    if file_name.endswith(".png"):
-        image_reader = tf.image.decode_png(file_reader, channels=3, name="png_reader")
-    elif file_name.endswith(".gif"):
-        image_reader = tf.squeeze(tf.image.decode_gif(file_reader, name="gif_reader"))
-    elif file_name.endswith(".bmp"):
-        image_reader = tf.image.decode_bmp(file_reader, name="bmp_reader")
-    else:
-        img2 = cv2.imread(file_name)
-        image_reader = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-        
-    float_caster = tf.cast(image_reader, tf.float32)
-    dims_expander = tf.expand_dims(float_caster, 0)
-    resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
-    normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
-    sess = tf.Session()
-    result = sess.run(normalized)
 
-    return result
-    
-def read_tensor_from_image(file_name,
+def read_tensor_from_image_file(file_name,
                                 input_height=299,
                                 input_width=299,
                                 input_mean=0,
@@ -117,10 +92,12 @@ def load_labels(label_file):
 
 
 if __name__ == "__main__":    
-    file_name = ""
+    #file_name = sys.argv[2]
     #model_file = "food_graph.pb"  
     #model_file = "output_graph.pb"  
-    model_file = "final_graph.pb"      
+    model_file = "final_graph.pb"  
+    #model_file = "converted_model.tflite"  
+    
     label_file = "output_labels.txt"
     #input_height = 299
     #input_width = 299
@@ -163,35 +140,16 @@ if __name__ == "__main__":
         input_layer = args.input_layer
     if args.output_layer:
         output_layer = args.output_layer
-       
+
+        
     graph = load_graph(model_file)
 
-    ########   image file input    
-    if(file_name is not ""):
-        t = read_tensor_from_image_file(
-            file_name,
-            input_height=input_height,
-            input_width=input_width,
-            input_mean=input_mean,
-            input_std=input_std)
-
-        input_name = "import/" + input_layer
-        output_name = "import/" + output_layer
-        input_operation = graph.get_operation_by_name(input_name)
-        output_operation = graph.get_operation_by_name(output_name)
-
-        with tf.Session(graph=graph) as sess:
-            results = sess.run(output_operation.outputs[0], {
-                input_operation.outputs[0]: t
-            })
-        results = np.squeeze(results)
-
-        top_k = results.argsort()[-5:][::-1]
-        labels = load_labels(label_file)
-        print("%s (%d)" % (labels[top_k[0]], results[top_k[0]] * 100))    
+    #print([n.name for n in tf.get_default_graph().as_graph_def().node])
     
-    ########   video input
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
+    #fps = cap.get(cv2.CAP_PROP_FPS)
+    #print ("Frames per second: {0}".format(fps))
+    #cap.set(cv2.CAP_PROP_FPS, 30)
     print ('Starting image capture')
 
     running = True
@@ -199,10 +157,36 @@ if __name__ == "__main__":
         try:
             #time.sleep(0.1)	
             start = time.time()
-            ret, frame = cap.read()            
-            if ret:			
-                t = read_tensor_from_image(
-                    frame,
+            ret, frame = cap.read()   
+            u_label = '.'
+            b_label = '.'
+            if ret:
+                '''    
+                -------------------------------------------
+                |                                         | 
+                |    (x1, y1)      w                      |
+                |      ------------------------           |
+                |      |                      |           |
+                |      |                      |           | 
+                |      |         ROI          | h         | 
+                |      |                      |           | 
+                |      |                      |           | 
+                |      |                      |           | 
+                |      ------------------------           | 
+                |                           (x2, y2)      | 
+                |                                         | 
+                |                                         | 
+                |                                         | 
+                -------------------------------------------             
+                ROI = image[y1:y2, x1:x2]
+                '''
+                height, width, _= frame.shape
+                
+                u_frame = frame[0:int(height/2), 0:width]  # ROI for upper in the frame 
+                b_frame = frame[int(height/2):height, 0:width]  # ROI for bottom in the frame 
+                
+                t = read_tensor_from_image_file(
+                    u_frame,
                     input_height=input_height,
                     input_width=input_width,
                     input_mean=input_mean,
@@ -221,18 +205,70 @@ if __name__ == "__main__":
 
                 top_k = results.argsort()[-5:][::-1]
                 labels = load_labels(label_file)
-                print("%s (%d)" % (labels[top_k[0]], results[top_k[0]] * 100))
+                #print("state: %s, score: %d" % (labels[top_k[0]], results[top_k[0]] * 100))
+                if(labels[top_k[0]] == 'meat' and ((results[top_k[0]] * 100) > 50)):
+                    print("meat detected (%d)" % (results[top_k[0]] * 100))
+                elif(labels[top_k[0]] == 'pot' and ((results[top_k[0]] * 100) > 50)):
+                    print('pot detected', ((results[top_k[0]] * 100) > 50)))
+                elif(labels[top_k[0]] == 'shrimp' and ((results[top_k[0]] * 100) > 50)):
+                    print('shrimp detected', ((results[top_k[0]] * 100) > 50)))                    
+                #else:
+                    #print('cooking other food')
+                #    print('.')
+
+                u_label = labels[top_k[0]]
+                #cv2.imshow("captured image", u_frame)
                 
-                cv2.imshow("captured image", frame)
-                key = cv2.waitKey(1000)
+                t = read_tensor_from_image_file(
+                    b_frame,
+                    input_height=input_height,
+                    input_width=input_width,
+                    input_mean=input_mean,
+                    input_std=input_std)
+
+                input_name = "import/" + input_layer
+                output_name = "import/" + output_layer
+                input_operation = graph.get_operation_by_name(input_name)
+                output_operation = graph.get_operation_by_name(output_name)
+
+                with tf.Session(graph=graph) as sess:
+                    results = sess.run(output_operation.outputs[0], {
+                        input_operation.outputs[0]: t
+                    })
+                results = np.squeeze(results)
+
+                top_k = results.argsort()[-5:][::-1]
+                labels = load_labels(label_file)
+                #print("state: %s, score: %d" % (labels[top_k[0]], results[top_k[0]] * 100))
+                if(labels[top_k[0]] == 'meat' and ((results[top_k[0]] * 100) > 50)):
+                    print("meat detected (%d)" % (results[top_k[0]] * 100))
+                elif(labels[top_k[0]] == 'pot' and ((results[top_k[0]] * 100) > 50)):
+                    print('pot detected')
+                elif(labels[top_k[0]] == 'shrimp' and ((results[top_k[0]] * 100) > 50)):
+                    print('shrimp detected')  
+                #else:
+                    #print('cooking other food')
+                #    print('.')
+
+                b_label = labels[top_k[0]]
+                #cv2.imshow("captured image2", b_frame)                
+                
+                imgs_comb = np.vstack((u_frame, b_frame))
+                cv2.imshow("final image", imgs_comb)
+                #key = cv2.waitKey(1000)
+                key = cv2.waitKey(500)
+                                
                 cv2.destroyAllWindows()
                 #key = cv2.waitKey(0)
                 #if(key == 27): 
-                #    cv2.destroyAllWindows()                    
+                #    cv2.destroyAllWindows()
+                    
             else:
                 print ('no more frame')
                 break
 
+            
+            print(u_label, b_label)
             end = time.time()
             seconds = end - start
             #print ("Time taken : {0} seconds".format(seconds))

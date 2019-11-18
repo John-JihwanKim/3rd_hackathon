@@ -3,6 +3,7 @@
 #include "AsyncDelay.h"
 #include "I2C.h"
 #include "ReadTemperatureADC.h"
+#include "SystemStatus.h"
 
 /* Timer base on 1-millisecond */
 static AsyncDelay OneSecondInterval;
@@ -26,11 +27,17 @@ static void EveryOneSecondLoop(void)
    PrintInformationForDebugging();
 }
 
+static void initializeThunder(void)
+{
+   SetUISystemStatus(eSYSTEM_ON);
+}
+
 void setup()
 {
    InitUARTForDebugging();
    InitUARTForThunderInduction();
    InitUARTForBLE();
+   initializeThunder();
 
    I2CSensorInit();
    OneSecondInterval.start(1000, AsyncDelay::MILLIS);
@@ -40,8 +47,6 @@ void setup()
 
 void loop()
 {
-   char ch;
-
    if(TwoHundredmSecondInterval.isExpired())
    {
       EveryTwoHundredmSecondLoop();
@@ -58,11 +63,5 @@ void loop()
    {
       EveryOneSecondLoop();
       OneSecondInterval.repeat();
-   }
-
-   if(Serial.available())
-   {
-      ch = Serial.read();
-      Serial.println("");
    }
 }
