@@ -45,9 +45,7 @@ static void EveryOneSecondLoop(void)
 {
    uint16_t remainedTime = GetRemainedTime();
    uint16_t cookRemainedTime = GetCookRemainedTime();
-#ifdef DEBUG
    PrintInformationForDebugging();
-#endif
 
    if(cookRemainedTime > 0)
    {
@@ -68,9 +66,7 @@ static void EveryOneSecondLoop(void)
    }
    else if(GetCookRemainedTime() == 0 && GetStepOfCurrentCooking() == eSYSTEM_CUR_COOK_STARTED_2)
    {
-#ifdef DEBUG
       Serial.println("@@@@@@@@ Cook Finished @@@@@@@");
-#endif
       // TODO : handle time out and finish cook
       SetCurrentInductionLevel(0);
       SetCurrentACLoads(0);
@@ -96,7 +92,7 @@ void setup()
    // InitUARTForCamera();
 
    I2CSensorInit();
-   SetRemainedTime(630); // for the test
+   SetRemainedTime(390); // for the test
    OneSecondInterval.start(1000, AsyncDelay::MILLIS);
    TwoHundredmSecondInterval.start(200, AsyncDelay::MILLIS);
    ThreeHundredmSecondInterval.start(300, AsyncDelay::MILLIS);

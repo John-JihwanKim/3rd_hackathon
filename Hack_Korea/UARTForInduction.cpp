@@ -44,21 +44,15 @@ uint16_t CalcultationCRC(uint8_t *buf, uint8_t len)
 
 static void SendingTXBufferToThunderInduction(void)
 {
-#ifdef DEBUG
    Serial.print("To Induction = ");
-#endif
    for(unsigned char i = 0; i <= eIND_TX_ETX; i++)
    {
       while(!(UCSR2A & (1<<UDRE2))){};
       UDR2 = TXToInduction[i];
-#ifdef DEBUG
       Serial.print(TXToInduction[i], HEX);
       Serial.print(" ");
-#endif
    }
-#ifdef DEBUG
    Serial.println("");
-#endif
 }
 
 static void LogDataForThunderInduction(void)
@@ -75,9 +69,7 @@ static void LogDataForThunderInduction(void)
 
 static void SetTXDataForThunderInduction(void)
 {
-#ifdef DEBUG
    LogDataForThunderInduction();
-#endif
    uint16_t crc = 0;
    
    TXToInduction[eIND_TX_STX] = STX;
@@ -119,10 +111,8 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    SetInductionSystemStatus(RXFromInduction[eIND_RX_MAINSTATUS_SYSTEAM]);
    SetCurrentHeightForUpperHeater(RXFromInduction[eIND_RX_HEIGHT_UPPERHEATER]);
 
-#ifdef DEBUG
    Serial.print("@@@@@ InductionStatus: = ");
    Serial.println(GetInductionSystemStatus());
-#endif
 
    switch (GetInductionSystemStatus())
    {
@@ -153,18 +143,14 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    }
 
    weight = RXFromInduction[eIND_RX_VALUE_WEIGHT0];
-#ifdef DEBUG
    Serial.print("1 : ");
    Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT0]);
-#endif
    weight <<= 8;
    weight |= RXFromInduction[eIND_RX_VALUE_WEIGHT1];
-#ifdef DEBUG
    Serial.print("2 : ");
    Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT1]);
    Serial.print("weight : ");
    Serial.println(weight);
-#endif
    SetCurrentWeight(weight);
 
    // @@@   TODO : Read weight and configure..  @@@
@@ -222,19 +208,13 @@ ISR(USART2_RX_vect)//This is for Thunder Indcution
                if(RXFromInduction[RXFromInduction[eIND_RX_UARTLENGTH]] == ETX)
                {
                   ProcessingForRecievedRXFromThunderInduction();
-#ifdef DEBUG
                   Serial.print("From Induction = ");
-#endif
                   for(uint8_t i = 0; i <= RXFromInduction[eIND_RX_UARTLENGTH]; i++)
                   {
-#ifdef DEBUG
                      Serial.print(RXFromInduction[i], HEX);
                      Serial.print(" ");
-#endif
                   }
-#ifdef DEBUG
                   Serial.println("");
-#endif
                }
                readbyte_count = 0;
             }

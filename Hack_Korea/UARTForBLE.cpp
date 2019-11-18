@@ -37,21 +37,15 @@ static void StartCook(void)
 
 static void SendingTXBufferToBLE(void)
 {
-#ifdef DEBUG
    Serial.print("To BLE = ");
-#endif
    for(unsigned char i = 0; i <= eBLE_TX_ETX; i++)
    {
       while(!(UCSR3A & (1<<UDRE3))){};
       UDR3 = TXToBLE[i];
-#ifdef DEBUG
       Serial.print(TXToBLE[i], HEX);
       Serial.print(" ");
-#endif
    }
-#ifdef DEBUG
    Serial.println("");
-#endif
 }
 
 static void SetTXDataForBLE(void)
