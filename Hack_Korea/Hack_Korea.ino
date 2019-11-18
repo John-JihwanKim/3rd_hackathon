@@ -9,6 +9,7 @@
 #include "ControlInduction.h"
 #include "ControlACLoads.h"
 #include "ControlHeightForUpperHeater.h"
+#include "SetZeroWeight.h"
 
 /* Timer base on 1-millisecond */
 static AsyncDelay OneSecondInterval;
@@ -16,10 +17,6 @@ static AsyncDelay ThreeHundredmSecondInterval;
 static AsyncDelay TwoHundredmSecondInterval;
 // static 
 
-
-// Serial for Camera
-// RX, TX
-// SoftwareSerial cameraSerial(19, 18);
 
 static void EveryTwoHundredmSecondLoop(void)
 {
@@ -32,10 +29,10 @@ static void EveryThreeHundredmSecondLoop(void)
    CalulationTemperatureForPotBottom();
 }
 
-// static void InitUARTForCamera(void)
-// {
-//    cameraSerial.begin(115200);
-// }
+static void InitUARTForCamera(void)
+{
+   Serial1.begin(115200);
+}
 
 static void EveryOneSecondLoop(void)
 {
@@ -52,8 +49,8 @@ static void EveryOneSecondLoop(void)
 
    if (GetCookRemainedTime() == 0 && GetStepOfCurrentCooking() == eSYSTEM_CUR_COOK_STARTED_1)
    {
-      SetCookRemainedTime(420);
-      // SetCookRemainedTime(20);
+      //SetCookRemainedTime(420);
+      SetCookRemainedTime(20);
       // Second cycle - heater
       SetCurrentInductionLevel(0);
       SetCurrentACLoads(7);
@@ -85,7 +82,11 @@ void setup()
    InitUARTForThunderInduction();
    InitUARTForBLE();
    initializeThunder();
-   // InitUARTForCamera();
+   SetZeroWeight(1);
+   SendDataToThunderInductionFrequently();
+   SetZeroWeight(0);
+
+   InitUARTForCamera();
    // Serial.println("Initialize All UARTs");
 
    I2CSensorInit();
@@ -97,7 +98,7 @@ void setup()
 
 void loop()
 {
-   // static char rxBuffer[4];
+   static char rxBuffer[4];
    if(TwoHundredmSecondInterval.isExpired())
    {
       EveryTwoHundredmSecondLoop();
@@ -115,16 +116,16 @@ void loop()
       EveryOneSecondLoop();
       OneSecondInterval.repeat();
    }
-   // if(cameraSerial.available())
-   // {
-   //    Serial.print("Camera Detection Data Start");
+   if(Serial1.available())
+   {
+      Serial.print("Camera Detection Data Start");
 
-   //    for (unsigned char i = 0; i < 4; i++)
-   //    {
-   //       rxBuffer[i] = Serial.read();
-   //       Serial.print(rxBuffer[i]);
-   //    }
+      for (unsigned char i = 0; i < 4; i++)
+      {
+         rxBuffer[i] = Serial1.read();
+         Serial.print(rxBuffer[i]);
+      }
 
-   //    Serial.print("Camera Detection Data End");
-   // }
+      Serial.print("Camera Detection Data End");
+   }
 }

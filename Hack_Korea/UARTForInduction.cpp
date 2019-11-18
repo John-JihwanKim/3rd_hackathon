@@ -17,6 +17,7 @@
 
 static uint8_t TXToInduction[eIND_TX_ETX + 1] = {0};
 static uint8_t RXFromInduction[eIND_RX_ETX + 1] = {0};
+static bool weightDetectNotice = false;
 
 uint16_t CalcultationCRC(uint8_t *buf, uint8_t len)
 {
@@ -45,7 +46,6 @@ uint16_t CalcultationCRC(uint8_t *buf, uint8_t len)
 static void SendingTXBufferToThunderInduction(void)
 {
    Serial.print("To Induction = ");
-
    for(unsigned char i = 0; i <= eIND_TX_ETX; i++)
    {
       while(!(UCSR2A & (1<<UDRE2))){};
@@ -150,9 +150,12 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
    weight |= RXFromInduction[eIND_RX_VALUE_WEIGHT1];
    Serial.print("2 : ");
    Serial.println(RXFromInduction[eIND_RX_VALUE_WEIGHT1]);
+   Serial.print("weight : ");
+   Serial.println(weight);
    SetCurrentWeight(weight);
 
-   if((uint8_t)weight > 200)
+   // @@@   TODO : Read weight and configure..  @@@
+   if(weight > 900)
    {
       // START DETECTING
       SetWhatstheRecipeIndexOfCurrentCooking(1);

@@ -26,8 +26,8 @@ static void StartCook(void)
    // SetRemainedTime(630);
    // SetCookRemainedTime(210);
    
-   SetRemainedTime(25);
-   SetCookRemainedTime(5);
+   SetRemainedTime(30);
+   SetCookRemainedTime(10);
    // First cycle - induction
    SetCurrentInductionLevel(10);
    SetCurrentACLoads(0);
