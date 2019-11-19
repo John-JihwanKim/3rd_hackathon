@@ -14,7 +14,7 @@
 #include "SystemStatus.h"
 #include "ControlCookingTime.h"
 #include "ControlRecipes.h"
-#include "SetZeroWeight.h"
+#include "DetectStatus.h"
 
 static uint8_t TXToBLE[eBLE_TX_ETX + 1] = {0};
 static uint8_t RXFromBLE[eBLE_RX_ETX + 1] = {0};
@@ -23,11 +23,11 @@ static void StartCook(void)
 {
    SetStepOfCurrentCooking(eSYSTEM_CUR_COOK_STARTED_1);
    SetUISystemStatus(eSYSTEM_STARTED);
-   // SetRemainedTime(630);
-   // SetCookRemainedTime(210);
+   SetRemainedTime(330);       //5m 30s
+   SetCookRemainedTime(150); // 2m 30
    
-   SetRemainedTime(30);
-   SetCookRemainedTime(10);
+   // SetRemainedTime(30);
+   // SetCookRemainedTime(10);
    // First cycle - induction
    SetCurrentInductionLevel(10);
    SetCurrentACLoads(0);
@@ -71,10 +71,10 @@ static void SetTXDataForBLE(void)
    TXToBLE[eBLE_TX_HEIGHT_FROMSENSOR_TOTARGET] = (uint8_t)GetHeightFromSensorToTarget();
    TXToBLE[eBLE_TX_REMAINED_TIME0] = (uint8_t)(remainedtime >> 8);
    TXToBLE[eBLE_TX_REMAINED_TIME1] = (uint8_t)remainedtime;
-   TXToBLE[eBLE_TX_DETECTED_FOOD_LR] = 0;
-   TXToBLE[eBLE_TX_DETECTED_FOOD_RR] = 0;
-   TXToBLE[eBLE_TX_DETECTED_FOOD_LF] = 0;
-   TXToBLE[eBLE_TX_DETECTED_FOOD_RF] = 0;
+   TXToBLE[eBLE_TX_DETECTED_FOOD_LR] = GetLeftRearStatus();
+   TXToBLE[eBLE_TX_DETECTED_FOOD_RR] = GetRightRearStatus();
+   TXToBLE[eBLE_TX_DETECTED_FOOD_LF] = GetLeftFrontStatus();
+   TXToBLE[eBLE_TX_DETECTED_FOOD_RF] = GetRightFrontStatus();
    TXToBLE[eBLE_TX_NUMBER_OF_STEPS_CURRENT_COOKING] = GetStepOfCurrentCooking(); // Current cooking status
    TXToBLE[eBLE_TX_MAX_STEPS_CURRENT_COOKING] = GetMaxStepOfCurrentCooking();
    TXToBLE[eBLE_TX_WHATS_THE_RECIPE_INDEX_CURRENT_COOKING] = GetWhatstheRecipeIndexOfCurrentCooking();

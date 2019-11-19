@@ -10,6 +10,8 @@
 #include "ControlACLoads.h"
 #include "ControlHeightForUpperHeater.h"
 #include "SetZeroWeight.h"
+#include "DetectStatus.h"
+#include <stdlib.h>
 
 /* Timer base on 1-millisecond */
 static AsyncDelay OneSecondInterval;
@@ -49,8 +51,8 @@ static void EveryOneSecondLoop(void)
 
    if (GetCookRemainedTime() == 0 && GetStepOfCurrentCooking() == eSYSTEM_CUR_COOK_STARTED_1)
    {
-      //SetCookRemainedTime(420);
-      SetCookRemainedTime(20);
+      SetCookRemainedTime(180); // 3m
+      // SetCookRemainedTime(20);
       // Second cycle - heater
       SetCurrentInductionLevel(0);
       SetCurrentACLoads(7);
@@ -90,7 +92,7 @@ void setup()
    // Serial.println("Initialize All UARTs");
 
    I2CSensorInit();
-   // SetRemainedTime(100); // for the test
+   SetRemainedTime(300); // for the test
    OneSecondInterval.start(1000, AsyncDelay::MILLIS);
    TwoHundredmSecondInterval.start(200, AsyncDelay::MILLIS);
    ThreeHundredmSecondInterval.start(300, AsyncDelay::MILLIS);
@@ -123,7 +125,24 @@ void loop()
       for (unsigned char i = 0; i < 4; i++)
       {
          rxBuffer[i] = Serial1.read();
-         Serial.print(rxBuffer[i]);
+         uint32_t myInt = rxBuffer[i];
+         Serial.println(myInt);
+         //UL UR BL BR
+         switch(i)
+         {
+         case 1:
+            SetLeftRearStatus((eDETECT_STATUS)myInt);
+            break;
+         case 2:
+            SetRightRearStatus((eDETECT_STATUS)myInt);
+            break;
+         case 3:
+            SetLeftFrontStatus((eDETECT_STATUS)myInt);
+            break;
+         case 4:
+            SetRightFrontStatus((eDETECT_STATUS)myInt);
+            break;
+         }
       }
 
       Serial.print("Camera Detection Data End");

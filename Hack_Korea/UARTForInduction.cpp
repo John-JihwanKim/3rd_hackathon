@@ -17,7 +17,6 @@
 
 static uint8_t TXToInduction[eIND_TX_ETX + 1] = {0};
 static uint8_t RXFromInduction[eIND_RX_ETX + 1] = {0};
-static bool weightDetectNotice = false;
 
 uint16_t CalcultationCRC(uint8_t *buf, uint8_t len)
 {
@@ -161,6 +160,12 @@ static void ProcessingForRecievedRXFromThunderInduction(void)
       SetWhatstheRecipeIndexOfCurrentCooking(1);
       SendDataToBLEFrequently();
    }
+   // else if (100 < weight < 200)
+   // {
+   //    SetZeroWeight(1);
+   //    SendDataToThunderInductionFrequently();
+   //    SetZeroWeight(0);
+   // }
 }
 
 void SendDataToThunderInductionFrequently(void)
